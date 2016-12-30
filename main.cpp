@@ -95,14 +95,11 @@ int main(int argc, char* argv[]) {
     fi.getObjByName("cylxray")->setKeyboardCallback(gObj::cylinderKeyboard);
     fi.getObjByName("cylxray")->setSpecialCallback(gObj::cylinderSpecial);
 
-    cout << "[_main_]  cylxray config finished" << endl;
-
-    fi.getObjByName("tankBottom")->setUpdateCallback(gObj::tankUpdate);
-    fi.getObjByName("tankWire")->setUpdateCallback(gObj::tankUpdate);
+    fi.getObjByName("tankWire")->setUpdateCallback(gObj::tankXray);
     //------------------------------------------------------------------
 
     //camFocus = fi.getObjByName("cylObject");
-    camFocus = fi.getObjByName("tankBottom");
+    camFocus = fi.getObjByName("tankWire");
     cameraUpdate = gObj::cameraUpdateCallback;
 
     cout << "[_main_]  Object(s) loaded" << endl;

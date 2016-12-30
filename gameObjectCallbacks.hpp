@@ -122,7 +122,7 @@ void cameraUpdateCallback(ingameObj* obj) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(60.0, 1, 0.01, 400.0);
-    gluLookAt(0.0f, 10.0f, -10.0f,         // location of camera, center of area, looking down
+    gluLookAt(0.0f, 20.0f, -20.0f,         // location of camera, center of area, looking down
                   obj->x, obj->y, obj->z, // point camera is looking at
                   0.0f, 1.0f, 0.0f);      // 'up' is... up
 }
@@ -168,6 +168,16 @@ void tankUpdate(ingameObj* obj) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glCallList(obj->obj);
 
+    zz++;
+}
+
+void tankXray(ingameObj* obj) {
+    static int zz = 0;
+    glDepthFunc(GL_ALWAYS);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glLoadIdentity();
+    glRotatef((GLfloat)zz, 0.0f, 1.0f, 0.0f);
+    glCallList(obj->obj); // render flat environment, grey
     zz++;
 }
 

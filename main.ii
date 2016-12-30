@@ -46537,7 +46537,7 @@ void cameraUpdateCallback(ingameObj* obj) {
     glMatrixMode(0x1701);
     glLoadIdentity();
     gluPerspective(60.0, 1, 0.01, 400.0);
-    gluLookAt(0.0f, 10.0f, -10.0f,
+    gluLookAt(0.0f, 20.0f, -20.0f,
                   obj->x, obj->y, obj->z,
                   0.0f, 1.0f, 0.0f);
 }
@@ -46583,6 +46583,16 @@ void tankUpdate(ingameObj* obj) {
     glPolygonMode(0x0408, 0x1B01);
     glCallList(obj->obj);
 
+    zz++;
+}
+
+void tankXray(ingameObj* obj) {
+    static int zz = 0;
+    glDepthFunc(0x0207);
+    glPolygonMode(0x0408, 0x1B01);
+    glLoadIdentity();
+    glRotatef((GLfloat)zz, 0.0f, 1.0f, 0.0f);
+    glCallList(obj->obj);
     zz++;
 }
 
@@ -56503,7 +56513,7 @@ namespace stl {
         int_o intUnion;
         ifile.read(intUnion.byte, 4);
 
-        std::cout << "Pre-sort: " << intUnion.int_ << std::endl;
+        std::cout << "[stlbin]  Pre-sort: " << intUnion.int_ << std::endl;
 
 
 
@@ -56545,10 +56555,10 @@ namespace stl {
 
         glNewList(nrmcBot, 0x1300);
         glBegin(0x0004);
-
+            glColor3f(myModel->r_, myModel->g_, myModel->b_);
             for(unsigned int i = 0; i < myModel->size(); i++) {
 
-                glColor3f(0.0f, 1.0f, 0.0f);
+
 
 
                 for(int j = 0; j < 3; j++) {
@@ -56569,7 +56579,7 @@ namespace stl {
         for(unsigned int i = 0; i < myModel->size(); i++) {
             glBegin(0x0002);
 
-                glColor3f(0.0f, 0.0f, 0.0f);
+
                 for(int j = 0; j < 3; j++) {
                     glVertex3f(myModel->at(i)->pts[j].x_, myModel->at(i)->pts[j].y_, myModel->at(i)->pts[j].z_);
                 }
@@ -56620,7 +56630,6 @@ namespace stl {
         }
 
         objParse::GLfloat3* myFloat3 = new objParse::GLfloat3;
-
 
         myFloat3->x_ = (lesser.x_ + larger.x_) / 2.0f;
         myFloat3->y_ = (lesser.y_ + larger.y_) / 2.0f;
@@ -56690,10 +56699,7 @@ namespace stl {
 
 }
 # 19 "/home/joe/CodeBlocks/NetworkGame/fileImporter.hpp" 2
-
-
-
-
+# 37 "/home/joe/CodeBlocks/NetworkGame/fileImporter.hpp"
 class fileImporter {
 public:
     void setImportDest(std::vector<ingameObj*>* dest,
@@ -56751,87 +56757,82 @@ public:
             _keyboard = importFile->first_attribute("keyboard");
             _model = importFile->first_attribute("model");
 
-            if(_type == __null) {
-                cerr << "[impErr]  File type not found." << endl;
+            myObj = new ingameObj;
+
+            char* nameStore = new char[_name->value_size() + 1];
+            memset(nameStore, '\0', _name->value_size());
+            strcpy(nameStore, _name->value());
+            myObj->name = nameStore;
+
+            cout << "[import]  " << "Name: " << myObj->name << endl;
+
+            if(strcmp(_behavior->value(),"dynamic")==0) {
+                cout << "[import]  " << "Behavior is dynamic" << endl;
+                dest->push_back(myObj);
+            } else if(strcmp(_behavior->value(),"static")==0) {
+                cout << "[import]  " << "Behavior is static" << endl;
+                staticObjs->push_back(myObj);
             } else {
-                cout << "[import]  File type: " << _type->value() << endl;
+                cerr << "[impErr]  " << "Behavior is undefined" << endl;
             }
 
-            if(_path == __null) {
-                cerr << "[impErr]  File name not found" << endl;
-                return;
+            if(strcmp(_keyboard->value(),"true")==0) {
+                cout << "[import]  " << "Object uses keyboard" << endl;
+                keyboardObjs->push_back(myObj);
+            } else if(strcmp(_keyboard->value(),"false")==0) {
+                cout << "[import]  " << "Object does not use keyboard" << endl;
             } else {
-                cout << "[import]  Parsing file: " << _path->value() << endl;
-                if(strcmp(_type->value(), "xml") == 0) {
-                    useXML = true;
-                    objParse::parseBotFile(_path->value());
-                    myObj = new ingameObj;
+                cerr << "[impErr]  " << "Keyboard usage is invalid" << endl;
+            }
 
-                    if(strcmp(_model->value(), "solid") == 0) {
-                        myObj->obj = objParse::getBot(objParse::GLfloatVec);
-                        cout << "[import]  Model type: solid" << endl;
-                    } else if(strcmp(_model->value(), "wireframe") == 0) {
-                        myObj->obj = objParse::getWireframe(objParse::GLfloatVec);
-                        cout << "[import]  Model type: wireframe" << endl;
-                    } else {
-                        cerr << "[impErr]  Invalid model type value" << endl;
-                    }
+            if(strcmp(_type->value(),"stlbinary")==0) {
 
-                } else if(strcmp(_type->value(), "stlbinary") == 0) {
-                    stl::openFile(_path->value());
-                    stl::Model* tempModel = stl::parseFileBinary();
+                cout << "[import]  " << "File type is binary .stl" << endl;
+                stl::openFile(_path->value());
+                stl::Model* m = stl::parseFileBinary();
 
-                    if(strcmp(_model->value(), "solid") == 0) {
-                        myObj->obj = stl::getBot(tempModel);
-                        cout << "[import]  Model type: solid" << endl;
-                        delete tempModel;
-                    } else if(strcmp(_model->value(), "wireframe") == 0) {
-                        myObj->obj = stl::getWireframe(tempModel);
-                        cout << "[import]  Model type: wireframe" << endl;
-                        delete tempModel;
-                    } else {
-                        cerr << "[impErr]  Invalid model type value" << endl;
-                    }
+                m->r_ = 1.0f;
+                m->g_ = 1.0f;
+                m->b_ = 1.0f;
 
+
+                rapidxml::xml_attribute<>* _color = importFile->first_attribute("r");
+                if(_color != 0)
+                    m->r_ = (GLfloat)atof(_color->value());
+                _color = importFile->first_attribute("g");
+                if(_color != 0)
+                    m->g_ = (GLfloat)atof(_color->value());
+                _color = importFile->first_attribute("b");
+                if(_color != 0)
+                    m->b_ = (GLfloat)atof(_color->value());
+
+                if(strcmp(_model->value(),"solid")==0) {
+                    myObj->obj = stl::getBot(m);
+                } else if(strcmp(_model->value(),"wireframe")==0) {
+                    myObj->obj = stl::getWireframe(m);
                 } else {
-                    cerr << "[impErr]  Invalid model file type" << endl;
+                    cerr << "[impErr]  " << "Model type is invalid" << endl;
                 }
 
-                if(_name == __null) {
-                    cerr << "[impErr]  Name not given" << endl;
-                } else {
+                delete m;
 
-                    uint32_t stringLength = _name->value_size() + 1;
-                    char* __name = new char[stringLength];
-                    for(uint32_t c = 0; c < stringLength; c++) {
-                        __name[c] = 0;
-                    }
-                    for(uint32_t c = 0; c < _name->value_size(); c++) {
-                        __name[c] = _name->value()[c];
-                    }
-                    myObj->name = __name;
+            } else if(strcmp(_type->value(),"xml")==0) {
+
+                cout << "[import]  " << "FIle type is XML" << endl;
+                objParse::parseBotFile(_path->value());
+
+                if(strcmp(_model->value(),"solid")==0) {
+                    myObj->obj = objParse::getBot(objParse::GLfloatVec);
+                } else if(strcmp(_model->value(),"wireframe")==0) {
+                    myObj->obj = objParse::getWireframe(objParse::GLfloatVec);
+                } else {
+                    cerr << "[impErr]  " << "Model type is invalid" << endl;
                 }
 
-                if(strcmp(_behavior->value(), "static") == 0) {
-                    staticObjs->push_back(myObj);
-                } else if(strcmp(_behavior->value(), "dynamic") == 0){
-                    dest->push_back(myObj);
+                delete objParse::GLfloatVec;
 
-
-                    if(strcmp(_keyboard->value(), "true") == 0) {
-                        keyboardObjs->push_back(myObj);
-                    } else if(strcmp(_keyboard->value(), "false") != 0) {
-                        cerr << "[impErr]  keyboard undefined" << endl;
-                    } else {
-                        cout << "[import]  object has no keyboard input" << endl;
-                    }
-
-                } else {
-                    cerr << "[impErr]  object behavior undefined" << endl;
-                }
-                if(useXML)
-                    delete objParse::GLfloatVec;
-                useXML = false;
+            } else {
+                cerr << "[impErr]  " << "File type is invalid" << endl;
             }
 
         } while(importFile = importFile->next_sibling("file"));
@@ -56840,10 +56841,13 @@ public:
 
 
     ingameObj* getObjByName(char* objname) {
+        cout << "[import]  " << "Searching for: " << objname << endl;
         for(uint32_t c = 0; c < dest->size(); c++) {
+            cout << "\t" << dest->at(c)->name << endl;
             if(strcmp(objname, dest->at(c)->name) == 0)
                 return dest->at(c);
         }
+        cerr << "[impErr]  " << "Object name: " << objname << " not found" << endl;
         return 0;
     }
 
@@ -56919,14 +56923,11 @@ int main(int argc, char* argv[]) {
     fi.getObjByName("cylxray")->setKeyboardCallback(gObj::cylinderKeyboard);
     fi.getObjByName("cylxray")->setSpecialCallback(gObj::cylinderSpecial);
 
-    cout << "[_main_]  cylxray config finished" << endl;
-
-    fi.getObjByName("tankBottom")->setUpdateCallback(gObj::tankUpdate);
-    fi.getObjByName("tankWire")->setUpdateCallback(gObj::tankUpdate);
+    fi.getObjByName("tankWire")->setUpdateCallback(gObj::tankXray);
 
 
 
-    camFocus = fi.getObjByName("tankBottom");
+    camFocus = fi.getObjByName("tankWire");
     cameraUpdate = gObj::cameraUpdateCallback;
 
     cout << "[_main_]  Object(s) loaded" << endl;

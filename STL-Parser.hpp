@@ -309,10 +309,10 @@ namespace stl { // objectParser.hpp has many similarly named functions and so we
 
         glNewList(nrmcBot, GL_COMPILE);
         glBegin(GL_TRIANGLES);
-
+            glColor3f(myModel->r_, myModel->g_, myModel->b_);
             for(unsigned int i = 0; i < myModel->size(); i++) {
                 // all triangles will be green
-                glColor3f(0.0f, 1.0f, 0.0f);
+                //glColor3f(0.0f, 1.0f, 0.0f);
                 //glColor3f(myModel->at(i)->r_ / 255.0f, myModel->at(i)->g_ / 255.0f, myModel->at(i)->b_ / 255.0f);
 
                 for(int j = 0; j < 3; j++) {
@@ -333,7 +333,7 @@ namespace stl { // objectParser.hpp has many similarly named functions and so we
         for(unsigned int i = 0; i < myModel->size(); i++) {
             glBegin(GL_LINE_LOOP);
                 // all triangles will be green
-                glColor3f(0.0f, 0.0f, 0.0f);
+                //glColor3f(0.0f, 0.0f, 0.0f);
                 for(int j = 0; j < 3; j++) {
                     glVertex3f(myModel->at(i)->pts[j].x_, myModel->at(i)->pts[j].y_, myModel->at(i)->pts[j].z_);
                 }

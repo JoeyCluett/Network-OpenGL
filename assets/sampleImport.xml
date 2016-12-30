@@ -41,14 +41,6 @@
 
 <file
     type="xml"
-    path="assets/xrayCylinder.xml"
-    name="cylxray"
-    behavior="dynamic"
-    keyboard="true"
-    model="wireframe" />
-
-<file
-    type="xml"
     path="assets/cylinderObj.xml"
     name="cylxray"
     behavior="dynamic"
@@ -69,6 +61,7 @@
     name="tankWire"
     behavior="dynamic"
     keyboard="true"
-    model="solid" />
+    model="solid"
+    r="1.0" g="1.0" b="1.0" />
 
 </root>

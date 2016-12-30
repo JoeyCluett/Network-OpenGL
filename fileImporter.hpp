@@ -20,6 +20,20 @@
 #include <glInGameObject.hpp>
 #include <objectParser.hpp>
 
+// macros to shorten up the code needed to do string comparisons
+#define BEHAVIOR_IS(w) strcmp(_behavior->value(),w)==0
+#define KEYBOARD_IS(w) strcmp(_keyboard->value(),w)==0
+#define TYPE_IS(w)     strcmp(_type->value(),w)==0
+#define MODEL_IS(w)    strcmp(_model->value(),w)==0
+
+// log and error output macros
+#define ERROR1(w)       cerr << "[impErr]  " << w << endl
+#define ERROR2(w, d)    cerr << "[impErr]  " << w << d << endl
+#define ERROR3(w, d, x) cerr << "[impErr]  " << w << d << x << endl
+
+#define LOG1(w)         cout << "[import]  " << w << endl
+#define LOG2(w, d)      cout << "[import]  " << w << d << endl
+#define LOG3(w, d, x)   cout << "[import]  " << w << d << x << endl
 class fileImporter {
 public:
     void setImportDest(std::vector<ingameObj*>* dest,
@@ -67,7 +81,7 @@ public:
         rapidxml::xml_attribute<>* _keyboard;
         rapidxml::xml_attribute<>* _model;
 
-        ingameObj* myObj;
+        ingameObj* myObj; // value of this pointer changes with every object
 
         do {
             _type     = importFile->first_attribute("type");
@@ -77,87 +91,82 @@ public:
             _keyboard = importFile->first_attribute("keyboard");
             _model    = importFile->first_attribute("model");
 
-            if(_type == NULL) {
-                cerr << "[impErr]  File type not found." << endl;
+            myObj = new ingameObj; // constant across all file types
+
+            char* nameStore = new char[_name->value_size() + 1];
+            memset(nameStore, '\0', _name->value_size());
+            strcpy(nameStore, _name->value());
+            myObj->name = nameStore; // object names are needed for all file types
+
+            LOG2("Name: ", myObj->name);
+
+            if(BEHAVIOR_IS("dynamic")) {
+                LOG1("Behavior is dynamic");
+                dest->push_back(myObj);
+            } else if(BEHAVIOR_IS("static")) {
+                LOG1("Behavior is static");
+                staticObjs->push_back(myObj);
             } else {
-                cout << "[import]  File type: " << _type->value() << endl;
+                ERROR1("Behavior is undefined");
             }
 
-            if(_path == NULL) {
-                cerr << "[impErr]  File name not found" << endl;
-                return;
+            if(KEYBOARD_IS("true")) {
+                LOG1("Object uses keyboard");
+                keyboardObjs->push_back(myObj);
+            } else if(KEYBOARD_IS("false")) {
+                LOG1("Object does not use keyboard");
             } else {
-                cout << "[import]  Parsing file: " << _path->value() << endl;
-                if(strcmp(_type->value(), "xml") == 0) {
-                    useXML = true;
-                    objParse::parseBotFile(_path->value());
-                    myObj = new ingameObj; // dont need to delete this one because we still need to access memory associated with the first one
+                ERROR1("Keyboard usage is invalid");
+            }
 
-                    if(strcmp(_model->value(), "solid") == 0) {
-                        myObj->obj = objParse::getBot(objParse::GLfloatVec);
-                        cout << "[import]  Model type: solid" << endl;
-                    } else if(strcmp(_model->value(), "wireframe") == 0) {
-                        myObj->obj = objParse::getWireframe(objParse::GLfloatVec);
-                        cout << "[import]  Model type: wireframe" << endl;
-                    } else {
-                        cerr << "[impErr]  Invalid model type value" << endl;
-                    }
+            if(TYPE_IS("stlbinary")) {
 
-                } else if(strcmp(_type->value(), "stlbinary") == 0) {
-                    stl::openFile(_path->value());
-                    stl::Model* tempModel = stl::parseFileBinary(); // this should be deleted immediately after use to avoid huge memory leak
+                LOG1("File type is binary .stl");
+                stl::openFile(_path->value());
+                stl::Model* m = stl::parseFileBinary();
 
-                    if(strcmp(_model->value(), "solid") == 0) {
-                        myObj->obj = stl::getBot(tempModel);
-                        cout << "[import]  Model type: solid" << endl;
-                        delete tempModel;
-                    } else if(strcmp(_model->value(), "wireframe") == 0) {
-                        myObj->obj = stl::getWireframe(tempModel);
-                        cout << "[import]  Model type: wireframe" << endl;
-                        delete tempModel;
-                    } else {
-                        cerr << "[impErr]  Invalid model type value" << endl;
-                    }
+                m->r_ = 1.0f;
+                m->g_ = 1.0f;
+                m->b_ = 1.0f;
 
+                // get the colors from file
+                rapidxml::xml_attribute<>* _color = importFile->first_attribute("r");
+                if(_color != 0)
+                    m->r_ = (GLfloat)atof(_color->value());
+                _color = importFile->first_attribute("g");
+                if(_color != 0)
+                    m->g_ = (GLfloat)atof(_color->value());
+                _color = importFile->first_attribute("b");
+                if(_color != 0)
+                    m->b_ = (GLfloat)atof(_color->value());
+
+                if(MODEL_IS("solid")) {
+                    myObj->obj = stl::getBot(m);
+                } else if(MODEL_IS("wireframe")) {
+                    myObj->obj = stl::getWireframe(m);
                 } else {
-                    cerr << "[impErr]  Invalid model file type" << endl;
+                    ERROR1("Model type is invalid");
                 }
 
-                if(_name == NULL) {
-                    cerr << "[impErr]  Name not given" << endl;
+                delete m;
+
+            } else if(TYPE_IS("xml")) {
+
+                LOG1("FIle type is XML");
+                objParse::parseBotFile(_path->value());
+
+                if(MODEL_IS("solid")) {
+                    myObj->obj = objParse::getBot(objParse::GLfloatVec);
+                } else if(MODEL_IS("wireframe")) {
+                    myObj->obj = objParse::getWireframe(objParse::GLfloatVec);
                 } else {
-                    // need to make sure name is somewhere on the heap and not released when rapidxml object is deleted
-                    uint32_t stringLength = _name->value_size() + 1;
-                    char* __name = new char[stringLength];
-                    for(uint32_t c = 0; c < stringLength; c++) {
-                        __name[c] = 0; // ensure space for null-terminated c-style string
-                    }
-                    for(uint32_t c = 0; c < _name->value_size(); c++) {
-                        __name[c] = _name->value()[c]; // copy string into global heap memory
-                    }
-                    myObj->name = __name;
+                    ERROR1("Model type is invalid");
                 }
 
-                if(strcmp(_behavior->value(), "static") == 0) {
-                    staticObjs->push_back(myObj);
-                } else if(strcmp(_behavior->value(), "dynamic") == 0){
-                    dest->push_back(myObj); // put object on dynamic list
+                delete objParse::GLfloatVec;
 
-                    // test keyboard input attribute
-                    if(strcmp(_keyboard->value(), "true") == 0) {
-                        keyboardObjs->push_back(myObj); // put object on keyboard list
-                    } else if(strcmp(_keyboard->value(), "false") != 0) {
-                        cerr << "[impErr]  keyboard undefined" << endl;
-                    } else {
-                        cout << "[import]  object has no keyboard input" << endl;
-                    }
-
-                } else {
-                    cerr << "[impErr]  object behavior undefined" << endl;
-                }
-                if(useXML)
-                    delete objParse::GLfloatVec; // only delete if actually used in parsing file
-                useXML = false;
+            } else {
+                ERROR1("File type is invalid");
             }
 
         } while(importFile = importFile->next_sibling("file"));
@@ -166,10 +175,13 @@ public:
 
     // this should not be called in time sensitive code
     ingameObj* getObjByName(char* objname) {
+        LOG2("Searching for: ", objname);
         for(uint32_t c = 0; c < dest->size(); c++) {
+            cout << "\t" << dest->at(c)->name << endl;
             if(strcmp(objname, dest->at(c)->name) == 0)
                 return dest->at(c);
         }
+        ERROR3("Object name: ", objname, " not found");
         return 0;
     }
 
