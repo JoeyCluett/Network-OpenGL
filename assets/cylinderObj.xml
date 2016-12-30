@@ -1,0 +1,89 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<body unit="in" name="sortaCylinder" numParts="1">
+<part>
+    <rect name="front"> <!-- just a bunch of squares -->
+        <vertex x="-5" y="0" z="-5" /> <!-- 'front' side -->
+        <vertex x="5" y="0" z="-5" />
+        <vertex x="5" y="20" z="-5" />
+        <vertex x="-5" y="20" z="-5" />
+        <color r="0" g="168" b="140" />
+        <shift x="0" y="0" z="0"/>
+    </rect>
+
+    <rect name="back"> <!-- just a bunch of squares -->
+        <vertex x="5"  y="0"  z="5" />
+        <vertex x="-5" y="0"  z="5" />
+        <vertex x="-5" y="20" z="5" />
+        <vertex x="5"  y="20" z="5" />
+        <color r="0" g="168" b="140" />
+        <shift x="0" y="0" z="0"/>
+    </rect>
+
+    <rect name="left">
+        <vertex x="5" y="0"  z="-5" />
+        <vertex x="5" y="0"  z="5" />
+        <vertex x="5" y="20" z="5" />
+        <vertex x="5" y="20" z="-5" />
+        <color r="0" g="168" b="140" />
+        <shift x="0" y="0" z="0"/>
+    </rect>
+
+    <rect name="right">
+        <vertex x="-5" y="0"  z="5" />
+        <vertex x="-5" y="0"  z="-5" />
+        <vertex x="-5" y="20" z="-5" />
+        <vertex x="-5" y="20" z="5" />
+        <color r="0" g="168" b="140" />
+        <shift x="0" y="0" z="0" />
+    </rect>
+
+    <rect name="a">
+        <vertex x="0"     y="0"  z="-7.071" />
+        <vertex x="7.071" y="0"  z="0" />
+        <vertex x="7.071" y="20" z="0" />
+        <vertex x="0"     y="20" z="-7.071" />
+        <color r="255" g="255" b="0" />
+        <shift x="0" y="0" z="0" />
+    </rect>
+
+    <rect name="b">
+        <vertex x="-7.071" y="0"  z="0" />
+        <vertex x="0"      y="0"  z="-7.071" />
+        <vertex x="0"      y="20" z="-7.071" />
+        <vertex x="-7.071" y="20" z="0" />
+        <color r="255" g="255" b="0" />
+        <shift x="0" y="0" z="0" />
+    </rect>
+
+    <rect name="c">
+        <vertex x="0"      y="0"  z="7.071" />
+        <vertex x="-7.071" y="0"  z="0" />
+        <vertex x="-7.071" y="20" z="0" />
+        <vertex x="0"      y="20" z="7.071" />
+        <color r="255" g="255" b="0" />
+        <shift x="0" y="0" z="0" />
+    </rect>
+
+    <rect name="d">
+        <vertex x="7.071" y="0"  z="0" />
+        <vertex x="0"     y="0"  z="7.071" />
+        <vertex x="0"     y="20" z="7.071" />
+        <vertex x="7.071" y="20" z="0" />
+        <color r="255" g="255" b="0" />
+        <shift x="0" y="0" z="0" />
+    </rect>
+
+    <rect name="top">
+        <vertex x="-5" y="20" z="-5" />
+        <vertex x="5"  y="20" z="-5" />
+        <vertex x="5"  y="20" z="5" />
+        <vertex x="-5" y="20" z="5" />
+        <color r="255" g="255" b="255" />
+        <shift x="0" y="0" z="0" />
+    </rect>
+
+</part>
+
+</body>

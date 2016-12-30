@@ -1,0 +1,74 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root>
+
+<!--
+    already have an STL type parser for binary and ASCII stl file parsers
+    name is optional and is for debugging purposes
+    behavior dictates how the game treats objects, ie whether they move or not
+        and how they move if they do
+    keyboard indicates whether the object needs a callback for keyboard control
+        static objects never recieve keyboard input
+        if behavior is static, the keyboard is ignored
+    model indicates whether the object will be rendered as a solid or a wireframe
+        this means the user has two ways of determining render method
+-->
+
+<file
+    type="xml"
+    path="assets/object.xml"
+    name="playerObject"
+    behavior="dynamic"
+    keyboard="true"
+    model="solid" />
+
+<file
+    type="xml"
+    path="assets/cylinderObj.xml"
+    name="cylObject"
+    behavior="dynamic"
+    keyboard="true"
+    model="solid" />
+
+<file
+    type="xml"
+    path="assets/base-environment.xml"
+    name="envObject"
+    behavior="static"
+    keyboard="false"
+    model="solid" />
+
+<file
+    type="xml"
+    path="assets/xrayCylinder.xml"
+    name="cylxray"
+    behavior="dynamic"
+    keyboard="true"
+    model="wireframe" />
+
+<file
+    type="xml"
+    path="assets/cylinderObj.xml"
+    name="cylxray"
+    behavior="dynamic"
+    keyboard="true"
+    model="wireframe" />
+
+<file
+    type="stlbinary"
+    path="assets/tankBottom.stl"
+    name="tankBottom"
+    behavior="dynamic"
+    keyboard="true"
+    model="solid" />
+
+<file
+    type="stlbinary"
+    path="assets/tankBottom.stl"
+    name="tankWire"
+    behavior="dynamic"
+    keyboard="true"
+    model="solid" />
+
+</root>

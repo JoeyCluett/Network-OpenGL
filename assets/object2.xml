@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<body unit="in" name="obj2" numParts="1">
+
+<part>
+    <rect name="slide1"> <!-- just a bunch of squares -->
+        <vertex x="-3" y="-3" z="0"/>
+        <vertex x="0" y="-3" z="0"/>
+        <vertex x="0" y="3" z="0"/>
+        <vertex x="-3" y="3" z="0"/>
+        <color r="255" g="0" b="0"/>
+        <shift x="0" y="0" z="0"/>
+    </rect>
+
+    <rect uses="slide1">
+        <shift x="3" y="0" z="0"/> <!-- shift away and behind -->
+        <color r="0" g="0" b="255"/>
+    </rect>
+
+</part>
+</body>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<body unit="in" name="environment" numParts="1">
+
+<part>
+    <rect name="slide1"> <!-- just a bunch of squares -->
+        <vertex x="-100" y="0" z="-100"/>
+        <vertex x="100"  y="-3" z="-100"/>
+        <vertex x="100"  y="0"  z="100"/>
+        <vertex x="-100" y="3"  z="100"/>
+        <color r="160" g="160" b="160"/>
+        <shift x="0" y="0" z="0"/>
+    </rect>
+
+</part>
+
+</body>
+
